@@ -81,24 +81,59 @@ class ApartmentForSale(BaseModel):
         related_name="apartments_for_sale",
     )
 
+    agent = models.ForeignKey(
+        "users.Agent",
+        on_delete=models.SET_NULL,
+        related_name="apartments_for_sale_by_agent",
+        null=True,
+        blank=True
+    )
+
+    landlord = models.ForeignKey(
+        "users.Landlord",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="apartments_for_sale_by_landlord"
+    )
+
 
 class ApartmentForRent(BaseModel):
     rent = models.DecimalField(max_digits=12, decimal_places=2)
     initial_rent = models.DecimalField(max_digits=12, decimal_places=2)
+
     apartment_type = models.ForeignKey(
         "ApartmentType",
         on_delete=models.PROTECT,
         related_name="apartments_for_rent"
     )
+
     region = models.ForeignKey(
         Region,
         on_delete=models.PROTECT,
         related_name="apartments_for_rent"
     )
+
     state = models.ForeignKey(
         State,
         on_delete=models.PROTECT,
         related_name="apartments_for_rent"
+    )
+
+    agent = models.ForeignKey(
+        "users.Agent",
+        on_delete=models.SET_NULL,
+        related_name="apartments_for_rent_by_agent",
+        null=True,
+        blank=True
+    )
+
+    landlord = models.ForeignKey(
+        "users.Landlord",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="apartments_for_rent_by_landlord"
     )
 
 
@@ -116,4 +151,20 @@ class Land(BaseModel):
         State,
         on_delete=models.PROTECT,
         related_name="lands"
+    )
+
+    agent = models.ForeignKey(
+        "users.Agent",
+        on_delete=models.SET_NULL,
+        related_name="lands_for_sale_by_agent",
+        null=True,
+        blank=True
+    )
+
+    landlord = models.ForeignKey(
+        "users.Landlord",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="lands_for_sale_by_landlord"
     )

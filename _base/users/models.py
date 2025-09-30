@@ -1,7 +1,7 @@
 from django.db import models
 from core.models import BaseModel
 from django.contrib.auth.models import (
-    AbstractUser, 
+    AbstractUser,
     BaseUserManager,
     Group
 )
@@ -91,6 +91,16 @@ class User(BaseModel, AbstractUser):
     def is_guest(self):
         return self.role == User.Role.GUEST
 
+    @property
+    def role_instance(self):
+        if self.is_agent:
+            return Agent.objects.filter(id=self.id).first()
+        elif self.is_landlord:
+            return Landlord.objects.filter(id=self.id).first()
+        elif self.is_client:
+            return Client.objects.filter(id=self.id).first()
+        return None
+
 
 # agents models
 class AgentManager(UserManager):
@@ -132,6 +142,7 @@ class LandlordManager(UserManager):
     def get_queryset(self):
         return super().get_queryset().filter(role=User.Role.LANDLORD)
 
+
 class Landlord(User):
     objects = LandlordManager()
 
@@ -146,10 +157,14 @@ class Landlord(User):
             self.groups.add(landlords_group)
 
 # client models
+
+
 class ClientManager(UserManager):
     """Manager to filter only client users."""
+
     def get_queryset(self):
         return super().get_queryset().filter(role=User.Role.CLIENT)
+
 
 class Client(User):
     """Proxy model for client users."""

@@ -4,6 +4,7 @@ from .models import ApartmentForSale, ApartmentForRent, Land
 from users.permissions import IsAgentOrLandlord, IsOwnerOrReadOnly
 from listings.serializers import ApartmentForSaleSerializer, ApartmentForRentSerializer, LandSerializer
 
+
 class ApartmentForSaleViewSet(viewsets.ModelViewSet):
     queryset = ApartmentForSale.objects.all()
     serializer_class = ApartmentForSaleSerializer
@@ -11,9 +12,9 @@ class ApartmentForSaleViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         if self.request.user.is_agent:
-            serializer.save(agent=self.request.user.agent)
+            serializer.save(agent=self.request.user.role_instance)
         elif self.request.user.is_landlord:
-            serializer.save(landlord=self.request.user.landlord)
+            serializer.save(landlord=self.request.user.role_instance)
 
 
 class ApartmentForRentViewSet(viewsets.ModelViewSet):
