@@ -1,7 +1,6 @@
-# realestate/views.py
 from rest_framework import viewsets
 from .models import ApartmentForSale, ApartmentForRent, Land
-from users.permissions import IsAgentOrLandlord, IsOwnerOrReadOnly
+from users.permissions import IsAgentOrLandlord
 from listings.serializers import ApartmentForSaleSerializer, ApartmentForRentSerializer, LandSerializer
 
 
@@ -24,9 +23,9 @@ class ApartmentForRentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         if self.request.user.is_agent:
-            serializer.save(agent=self.request.user.agent)
+            serializer.save(agent=self.request.user.role_instance)
         elif self.request.user.is_landlord:
-            serializer.save(landlord=self.request.user.landlord)
+            serializer.save(landlord=self.request.user.role_instance)
 
 
 class LandViewSet(viewsets.ModelViewSet):
@@ -36,6 +35,6 @@ class LandViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         if self.request.user.is_agent:
-            serializer.save(agent=self.request.user.agent)
+            serializer.save(agent=self.request.user.role_instance)
         elif self.request.user.is_landlord:
-            serializer.save(landlord=self.request.user.landlord)
+            serializer.save(landlord=self.request.user.role_instance)
