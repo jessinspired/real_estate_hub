@@ -63,7 +63,6 @@ class Region(TextNormalizationMixin, BaseModel):
 # Listings Models
 class ApartmentForSale(BaseModel):
     price = models.DecimalField(max_digits=12, decimal_places=2)
-    square_feet = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
 
     region = models.ForeignKey(
         Region,
@@ -76,6 +75,11 @@ class ApartmentForSale(BaseModel):
         related_name="apartments_for_sale"
     )
 
+    apartment_type = models.ForeignKey(
+        "ApartmentType",
+        on_delete=models.PROTECT,
+        related_name="apartments_for_sale",
+    )
 
 
 class ApartmentForRent(BaseModel):
@@ -100,7 +104,8 @@ class ApartmentForRent(BaseModel):
 
 class Land(BaseModel):
     price = models.DecimalField(max_digits=12, decimal_places=2)
-    plot_size = models.DecimalField(max_digits=10, decimal_places=2, help_text="Size in square meters")
+    plot_size = models.DecimalField(
+        max_digits=10, decimal_places=2, help_text="Size in square meters")
     titled = models.BooleanField(default=False)
     region = models.ForeignKey(
         Region,
@@ -112,4 +117,3 @@ class Land(BaseModel):
         on_delete=models.PROTECT,
         related_name="lands"
     )
-
