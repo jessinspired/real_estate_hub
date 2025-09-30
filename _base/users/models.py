@@ -1,6 +1,10 @@
 from django.db import models
 from core.models import BaseModel
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import (
+    AbstractUser, 
+    BaseUserManager,
+    Group
+)
 from users.utils import generate_unique_username
 
 
@@ -86,3 +90,88 @@ class User(BaseModel, AbstractUser):
     @property
     def is_guest(self):
         return self.role == User.Role.GUEST
+
+
+# agents models
+class AgentManager(UserManager):
+    """Manager for agent proxy table."""
+
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).filter(role=User.Role.AGENT)
+
+
+class Agent(User):
+    """Defines the agent proxy model."""
+
+    objects = AgentManager()
+
+    class Meta:
+        proxy = True
+
+    def welcome(self):
+        return "Hello agent"
+
+    def save(self, *args, **kwargs):
+        """Saves lister object and adds it to the agents' group."""
+        self.role = User.Role.AGENT
+        super().save(*args, **kwargs)
+
+        agents_group, created = Group.objects.get_or_create(name="agents")
+
+        if not self.groups.filter(name="agents").exists():
+            self.groups.add(agents_group)
+
+    def delete(self, *args, **kwargs):
+        """Removes agent from group before deleting."""
+        self.groups.remove(Group.objects.get(name='agents'))
+        super().delete(*args, **kwargs)
+
+
+# landlords models
+class LandlordManager(UserManager):
+    def get_queryset(self):
+        return super().get_queryset().filter(role=User.Role.LANDLORD)
+
+class Landlord(User):
+    objects = LandlordManager()
+
+    class Meta:
+        proxy = True
+
+    def save(self, *args, **kwargs):
+        self.role = User.Role.LANDLORD
+        super().save(*args, **kwargs)
+        landlords_group, _ = Group.objects.get_or_create(name="landlords")
+        if not self.groups.filter(name="landlords").exists():
+            self.groups.add(landlords_group)
+
+# client models
+class ClientManager(UserManager):
+    """Manager to filter only client users."""
+    def get_queryset(self):
+        return super().get_queryset().filter(role=User.Role.CLIENT)
+
+class Client(User):
+    """Proxy model for client users."""
+    objects = ClientManager()
+
+    class Meta:
+        proxy = True
+
+    def save(self, *args, **kwargs):
+        """Ensure role is CLIENT and add to clients group."""
+        self.role = User.Role.CLIENT
+        super().save(*args, **kwargs)
+
+        clients_group, _ = Group.objects.get_or_create(name="clients")
+        if not self.groups.filter(name="clients").exists():
+            self.groups.add(clients_group)
+
+    def delete(self, *args, **kwargs):
+        """Remove client from group before deleting."""
+        if self.groups.filter(name="clients").exists():
+            self.groups.remove(Group.objects.get(name="clients"))
+        super().delete(*args, **kwargs)
+
+    def welcome(self):
+        return f"Welcome client {self.first_name}"

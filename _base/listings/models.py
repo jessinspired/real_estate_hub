@@ -1,5 +1,5 @@
 from django.db import models
-from core.models import BaseModel, StringNormalizationMixin
+from core.models import BaseModel, TextNormalizationMixin
 from django.core.exceptions import ValidationError
 
 
@@ -26,7 +26,8 @@ class ApartmentType(BaseModel):
             raise ValidationError(e)
 
 
-class State(StringNormalizationMixin, BaseModel):
+# Regional Models
+class State(TextNormalizationMixin, BaseModel):
     name = models.CharField(max_length=150)
 
     normalized_name = models.CharField(
@@ -42,7 +43,7 @@ class State(StringNormalizationMixin, BaseModel):
         return self.name
 
 
-class Region(StringNormalizationMixin, BaseModel):
+class Region(TextNormalizationMixin, BaseModel):
     name = models.CharField(max_length=150)
 
     normalized_name = models.CharField(
@@ -57,3 +58,58 @@ class Region(StringNormalizationMixin, BaseModel):
 
     def __str__(self):
         return self.name
+
+
+# Listings Models
+class ApartmentForSale(BaseModel):
+    price = models.DecimalField(max_digits=12, decimal_places=2)
+    square_feet = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+
+    region = models.ForeignKey(
+        Region,
+        on_delete=models.PROTECT,
+        related_name="apartments_for_sale"
+    )
+    state = models.ForeignKey(
+        State,
+        on_delete=models.PROTECT,
+        related_name="apartments_for_sale"
+    )
+
+
+
+class ApartmentForRent(BaseModel):
+    rent = models.DecimalField(max_digits=12, decimal_places=2)
+    initial_rent = models.DecimalField(max_digits=12, decimal_places=2)
+    apartment_type = models.ForeignKey(
+        "ApartmentType",
+        on_delete=models.PROTECT,
+        related_name="apartments_for_rent"
+    )
+    region = models.ForeignKey(
+        Region,
+        on_delete=models.PROTECT,
+        related_name="apartments_for_rent"
+    )
+    state = models.ForeignKey(
+        State,
+        on_delete=models.PROTECT,
+        related_name="apartments_for_rent"
+    )
+
+
+class Land(BaseModel):
+    price = models.DecimalField(max_digits=12, decimal_places=2)
+    plot_size = models.DecimalField(max_digits=10, decimal_places=2, help_text="Size in square meters")
+    titled = models.BooleanField(default=False)
+    region = models.ForeignKey(
+        Region,
+        on_delete=models.PROTECT,
+        related_name="lands"
+    )
+    state = models.ForeignKey(
+        State,
+        on_delete=models.PROTECT,
+        related_name="lands"
+    )
+

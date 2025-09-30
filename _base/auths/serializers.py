@@ -1,6 +1,6 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
-from users.models import User
+from users.models import User, Agent, Landlord, Client
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -12,7 +12,17 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop("password")
-        user = User.objects.create_user(password=password, **validated_data)
+        role = validated_data.get("role", User.Role.GUEST)
+
+        if role == User.Role.AGENT:
+            user = Agent.objects.create_user(password=password, **validated_data)
+        elif role == User.Role.LANDLORD:
+            user = Landlord.objects.create_user(password=password, **validated_data)
+        elif role == User.Role.CLIENT:
+            user = Client.objects.create_user(password=password, **validated_data)
+        else:
+            user = User.objects.create_user(password=password, **validated_data)
+
         return user
 
 

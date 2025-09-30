@@ -17,7 +17,7 @@ class BaseModel(models.Model):
         abstract = True
 
 
-class StringNormalizationMixin:
+class TextNormalizationMixin:
     def normalize_fields(self):
         self.normalized_name = normalize_text(self.name)
         if hasattr(self, "abbr"):
