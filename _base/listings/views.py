@@ -1,3 +1,6 @@
+from rest_framework.views import APIView
+from itertools import chain
+from rest_framework.response import Response
 from rest_framework import viewsets
 from .models import (
     PropertyImage,
@@ -91,3 +94,32 @@ class LandImageViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAgentOrLandlord]
     http_method_names = ['get', 'post', 'head', 'delete']
     parser_classes = [MultiPartParser, FormParser]
+
+
+class CombinedListingsView(APIView):
+    """Marketplace feed style view that combines all listings
+
+    Args:
+        APIView (APIView): rest framework API view
+    """
+
+    def get(self, request):
+        sales = ApartmentForSale.objects.all()
+        rents = ApartmentForRent.objects.all()
+        lands = Land.objects.all()
+
+        serialized_sales = ApartmentForSaleSerializer(sales, many=True).data
+        for s in serialized_sales:
+            s["listing_type"] = "apartment_for_sale"
+
+        serialized_rents = ApartmentForRentSerializer(rents, many=True).data
+        for r in serialized_rents:
+            r["listing_type"] = "apartment_for_rent"
+
+        serialized_lands = LandSerializer(lands, many=True).data
+        for l in serialized_lands:
+            l["listing_type"] = "land"
+
+        combined = list(
+            chain(serialized_sales, serialized_rents, serialized_lands))
+        return Response(combined)

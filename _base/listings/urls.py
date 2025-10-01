@@ -26,4 +26,5 @@ router.register(r'land-images', views.LandImageViewSet,
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('browse/', views.CombinedListingsView.as_view(), name='browse-listings'),
 ]
