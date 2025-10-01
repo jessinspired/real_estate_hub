@@ -1,7 +1,10 @@
+from .serializers import PropertyImageSerializer
+from .models import PropertyImage
 from rest_framework import viewsets
 from .models import ApartmentForSale, ApartmentForRent, Land
 from users.permissions import IsAgentOrLandlord
 from listings.serializers import ApartmentForSaleSerializer, ApartmentForRentSerializer, LandSerializer
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 class ApartmentForSaleViewSet(viewsets.ModelViewSet):
@@ -38,3 +41,14 @@ class LandViewSet(viewsets.ModelViewSet):
             serializer.save(agent=self.request.user.role_instance)
         elif self.request.user.is_landlord:
             serializer.save(landlord=self.request.user.role_instance)
+
+
+# image upload demo
+
+
+class PropertyImageViewSet(viewsets.ModelViewSet):
+    queryset = PropertyImage.objects.all()
+    serializer_class = PropertyImageSerializer
+    permission_classes = [IsAgentOrLandlord]
+    http_method_names = ['get', 'post', 'head', 'delete']
+    parser_classes = [MultiPartParser, FormParser]

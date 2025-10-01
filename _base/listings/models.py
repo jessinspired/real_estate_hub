@@ -168,3 +168,10 @@ class Land(BaseModel):
         on_delete=models.SET_NULL,
         related_name="lands_for_sale_by_landlord"
     )
+
+
+# property images
+class PropertyImage(models.Model):
+    # for demo purposes, we are not linking this to any property model
+    image = models.ImageField(upload_to="properties/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
