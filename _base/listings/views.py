@@ -1,9 +1,23 @@
-from .serializers import PropertyImageSerializer
-from .models import PropertyImage
 from rest_framework import viewsets
-from .models import ApartmentForSale, ApartmentForRent, Land
+from .models import (
+    PropertyImage,
+    ApartmentForSale,
+    ApartmentForRent,
+    Land,
+    ApartmentForRentImage,
+    ApartmentForSaleImage,
+    LandImage,
+)
 from users.permissions import IsAgentOrLandlord
-from listings.serializers import ApartmentForSaleSerializer, ApartmentForRentSerializer, LandSerializer
+from listings.serializers import (
+    ApartmentForSaleSerializer,
+    ApartmentForRentSerializer,
+    LandSerializer,
+    PropertyImageSerializer,
+    ApartmentForRentImageSerializer,
+    ApartmentForSaleImageSerializer,
+    LandImageSerializer,
+)
 from rest_framework.parsers import MultiPartParser, FormParser
 
 
@@ -47,8 +61,33 @@ class LandViewSet(viewsets.ModelViewSet):
 
 
 class PropertyImageViewSet(viewsets.ModelViewSet):
+    # for demo purposes, we are not linking this to any property model
     queryset = PropertyImage.objects.all()
     serializer_class = PropertyImageSerializer
+    permission_classes = [IsAgentOrLandlord]
+    http_method_names = ['get', 'post', 'head', 'delete']
+    parser_classes = [MultiPartParser, FormParser]
+
+
+class ApartmentForRentImageViewSet(viewsets.ModelViewSet):
+    queryset = ApartmentForRentImage.objects.all()
+    serializer_class = ApartmentForRentImageSerializer
+    permission_classes = [IsAgentOrLandlord]
+    http_method_names = ['get', 'post', 'head', 'delete']
+    parser_classes = [MultiPartParser, FormParser]
+
+
+class ApartmentForSaleImageViewSet(viewsets.ModelViewSet):
+    queryset = ApartmentForSaleImage.objects.all()
+    serializer_class = ApartmentForSaleImageSerializer
+    permission_classes = [IsAgentOrLandlord]
+    http_method_names = ['get', 'post', 'head', 'delete']
+    parser_classes = [MultiPartParser, FormParser]
+
+
+class LandImageViewSet(viewsets.ModelViewSet):
+    queryset = LandImage.objects.all()
+    serializer_class = LandImageSerializer
     permission_classes = [IsAgentOrLandlord]
     http_method_names = ['get', 'post', 'head', 'delete']
     parser_classes = [MultiPartParser, FormParser]
