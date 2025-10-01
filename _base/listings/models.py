@@ -1,6 +1,7 @@
 from django.db import models
 from core.models import BaseModel, TextNormalizationMixin
 from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 
 
 class ApartmentType(BaseModel):
@@ -178,7 +179,15 @@ class PropertyImage(models.Model):
 
 
 class ApartmentForRentImage(BaseModel):
-    image = models.ImageField(upload_to="apartments_for_rent/")
+    image = models.FileField(
+        upload_to="apartments_for_rent/",
+        validators=[FileExtensionValidator(
+            allowed_extensions=[
+                "jpg", "jpeg", "png", "gif", "bmp", "tiff", "tif", "webp", "svg",
+                "heic", "heif"
+            ]
+        )]
+    )
     apartment_for_rent = models.ForeignKey(
         ApartmentForRent,
         on_delete=models.CASCADE,
@@ -188,7 +197,15 @@ class ApartmentForRentImage(BaseModel):
 
 
 class ApartmentForSaleImage(BaseModel):
-    image = models.ImageField(upload_to="apartments_for_sale/")
+    image = models.FileField(
+        upload_to="apartments_for_sale/",
+        validators=[FileExtensionValidator(
+            allowed_extensions=[
+                "jpg", "jpeg", "png", "gif", "bmp", "tiff", "tif", "webp", "svg",
+                "heic", "heif"
+            ]
+        )]
+    )
     apartment_for_sale = models.ForeignKey(
         ApartmentForSale,
         on_delete=models.CASCADE,
@@ -198,7 +215,15 @@ class ApartmentForSaleImage(BaseModel):
 
 
 class LandImage(BaseModel):
-    image = models.ImageField(upload_to="lands/")
+    image = models.FileField(
+        upload_to="lands/",
+        validators=[FileExtensionValidator(
+            allowed_extensions=[
+                "jpg", "jpeg", "png", "gif", "bmp", "tiff", "tif", "webp", "svg",
+                "heic", "heif"
+            ]
+        )]
+    )
     land = models.ForeignKey(
         Land,
         on_delete=models.CASCADE,
