@@ -29,15 +29,15 @@ class LandSerializer(serializers.ModelSerializer):
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
-    image_url = serializers.SerializerMethodField()
+    # image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = PropertyImage
-        fields = ["id", "image", "image_url", "uploaded_at"]
+        fields = ["id", "image", "uploaded_at"]
         read_only_fields = ["id", "uploaded_at"]
 
-    def get_image_url(self, obj):
-        if obj.image:
-            # This uses Django Storage backend (CloudFront if set)
-            return obj.image.url
-        return None
+    # def get_image_url(self, obj):
+    #     if obj.image:
+    #         # This uses Django Storage backend (CloudFront if set)
+    #         return obj.image.url
+    #     return None
